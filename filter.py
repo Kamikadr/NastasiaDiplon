@@ -73,17 +73,21 @@ def filterEnergy(data):
             filtered_content_block = []
             pair = []
             for line in content_block:
-                if len(pair) == 0 and line["j1"] == item - 1:
-                    pair.append(line)
-                    continue
                 if len(pair) == 1 and line["j1"] == item and line["j2"] == pair[0]["j2"]:
                     pair.append(line)
                     continue
-                if len(pair) == 2 or len(pair) == 1 and line["j1"] == item + 1 and line["j2"] == pair[0]["j2"]:
+                if (len(pair) == 2 or len(pair) == 1) and line["j1"] == item + 1 and line["j2"] == pair[0]["j2"]:
                     pair.append(line)
                     for filteredLine in pair:
                         filtered_content_block.append(filteredLine)
-                pair = []
+                    pair = []
+                    continue
+                else:
+                    pair = []
+
+                if len(pair) == 0 and line["j1"] == item - 1:
+                    pair.append(line)
+                    continue
             if len(filtered_content_block) != 0:
                 filtered_searching_block.append(filtered_content_block)
         
