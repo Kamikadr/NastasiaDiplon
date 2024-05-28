@@ -1,0 +1,11 @@
+C:\NastasiaDiplon
+3
+0
+15
+gr32new
+9md
+.2
+.001
+C:\NastasiaDiplon\search
+C:\NastasiaDiplon\search\result.txt
+C:\NastasiaDiplon\search\fresult.txt
