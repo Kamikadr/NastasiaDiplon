@@ -119,8 +119,8 @@ with open(output_file_path, 'w', encoding='utf-8') as file:
                     file.write('\n')
                 file.write('\n')
 
-
-chousen_blocks = enengyChoose.chooseEnergy(filtered_data, 0)
+k = int(input("Enter k: "))
+chousen_blocks = enengyChoose.chooseEnergy(filtered_data, k)
 output_file_path = path + "\OBFULEXT.EXP"
 with open(output_file_path, 'w', encoding='windows-1251') as file:
      file.write(f"J ЌЂ—.     {j}   J ЉЋЌ.   {jn}  ЉЋ‹ ‹€Ќ€‰  {len(chousen_blocks)}\n")

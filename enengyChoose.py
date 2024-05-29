@@ -1,9 +1,8 @@
 
-def chooseEnergy(data, startIndex):
+def chooseEnergy(data, needIndex):
     result = []
-    for i in range(startIndex, len(data), 2):
-        search_block = data[i]
-        if len(search_block) == 1:
+    for search_block in data:
+        if len(search_block) == 1 or search_block[0]["j2"] != needIndex:
             continue
 
         k = search_block[0]["j2"]
@@ -40,7 +39,7 @@ def findMinIntensityBlock(blocks):
 
 
 def createBlockItem(block, search_block):
-    return f"{search_block[0]['V']}\t{getAverageEnergy(block):.5f}\t\t\t\t{getWeigth(block)}\tJ=\t{search_block[0]['j1']}\t{search_block[0]['j2']}\t{search_block[0]['j3']}\t001"
+    return f"  {search_block[0]['V']}  {getAverageEnergy(block):.5f}    {getWeigth(block)}          J=  {search_block[0]['j1']}  {search_block[0]['j2']}  {search_block[0]['j3']}   001"
 
 def getWeigth(block):
     intensityDiff = abs(block[0]["intensity"] - block[-1]["intensity"])
