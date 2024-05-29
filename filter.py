@@ -6,7 +6,8 @@ def read_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         return file.readlines()
 
-def format_content(input_content):
+def format_content(input_content, chousen_blocks):
+    chousen_blocks_counter = 0
     pattern = re.compile(r'(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d{5})?\s*(\d+\.\d+)\s+(\d+\.\d+)')
     search_pattern = re.compile(r' Searching\s+(\d+)\s+(\d+)\s+(\d+)\s+near\s+(\d+\.\d+)')
     formatted_content = []
@@ -24,11 +25,13 @@ def format_content(input_content):
             search_block = []
             search_pattern_value = search_pattern.search(line)
             line_data = {
+                "V": chousen_blocks[chousen_blocks_counter][0]["V"],
                 "j1": int(search_pattern_value.group(1)),
                 "j2": int(search_pattern_value.group(2)),
                 "j3": int(search_pattern_value.group(3)),
                 "energy": float(search_pattern_value.group(4))
             }
+            chousen_blocks_counter += 1
             search_block.append(line_data)
         else:
             matches = pattern.findall(line)

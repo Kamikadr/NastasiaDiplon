@@ -1,4 +1,4 @@
-C:\Users\evgeniy.fateev\source\repos\NastasiaDiplon
+C:\NastasiaDiplon
 0
 7
 12
@@ -6,6 +6,6 @@ gr32new
 9md
 .2
 .001
-C:\Users\evgeniy.fateev\source\repos\NastasiaDiplon\search
-C:\Users\evgeniy.fateev\source\repos\NastasiaDiplon\search\result.txt
-C:\Users\evgeniy.fateev\source\repos\NastasiaDiplon\search\fresult.txt
+C:\NastasiaDiplon\search
+C:\NastasiaDiplon\search\result.txt
+C:\NastasiaDiplon\search\fresult.txt

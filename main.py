@@ -1,20 +1,20 @@
 import re
-import csv
 import jkj_jk1j as matGenerator
 import filter
+import enengyChoose
 import subprocess
 import os
 
 # Открываем файл для чтения
-path = input("Enter OBFULEXT — копия.RES.txt path: ")
-file_path = path + '/OBFULEXT — копия.RES.txt'
+path = input("Enter OBFULEXT.RES path: ")
+file_path = path + '/OBFULEXT.RES'
 with open(file_path, 'r') as file:
     content = file.readlines()
 
 # Регулярные выражения для поиска данных
 iteration_re = re.compile(r'iteration')
 j_v_matrix_re = re.compile(r'J=\s*(\d+)\s*(\d+)\s*matrix')
-v_j_values_re = re.compile(r'V=\s*(\d+)\s*J=\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*([\d.]+(?:E[+-]?\d+)?)\s*')
+v_j_values_re = re.compile(r'(\d+)\s+V=\s*\d+\s*J=\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*([\d.]+(?:E[+-]?\d+)?)\s*')
 
 data = []
 current_j = None
@@ -28,11 +28,13 @@ for line in content:
         continue
     v_j_values_match = v_j_values_re.search(line)
     if v_j_values_match:
-        J1 = int(v_j_values_match.group(2))
-        J2 = int(v_j_values_match.group(3))
-        J3 = int(v_j_values_match.group(4))
-        value = float(v_j_values_match.group(5) + v_j_values_match.group(6))
-        line = [J1, J2, J3, value]
+        line = {
+             "V": int(v_j_values_match.group(1)),
+             "j1":int(v_j_values_match.group(2)),
+             "j2":int(v_j_values_match.group(3)),
+             "j3":int(v_j_values_match.group(4)),
+             "energy":float(v_j_values_match.group(5) + v_j_values_match.group(6))
+        }
         data.append(line)
     
 
@@ -44,36 +46,37 @@ for row in data[:5]:
 k1 = int(input('Enter Ka1: '))
 j = int(input('Enter J0: '))
 jn = int(input('Enter Jn: '))
-result = ""
+header = ""
 controlFile = input("Enter Control file: ")
-result += f"{controlFile}     <- ground level file\n"
+header += f"{controlFile}     <- ground level file\n"
 spectrumFile = input("Enter Spectrum file: ")
-result += f"{spectrumFile}       <- spectrum\n"
+header += f"{spectrumFile}       <- spectrum\n"
 rangeValue = input("Enter Range: ")
-result += f"{rangeValue} <- range\n"
+header += f"{rangeValue} <- range\n"
 accuracy   = input("Enter Accuracy: ")
-result += f"{accuracy} <- accuracy\n"
+header += f"{accuracy} <- accuracy\n"
 
+chousen_blocks = []
 for line in data:
-    if line[0] < j or line[0] > jn:
+    if line["j1"] < j or line["j1"] > jn:
         continue
-    if line[2] != line[0] - k1:
+    if line["j3"] != line["j1"] - k1:
         continue
-    if line[1] == k1:
-        matrix = matGenerator.generateMatrix(line[1], line[0], line[0] - line[1])
-        block = str(line[3]) + '\t' + str(line[0]) + " " + str(line[1]) + " " + str(line[2]) + '\n' + matrix
-        print(block)
-        result += block + '\n'
-    if line[1] == k1 + 1:
-        matrix = matGenerator.generateMatrix(line[1], line[0], line[0] - line[1] + 1)
-        block = str(line[3]) + '\t' + str(line[0]) + " " + str(line[1]) + " " + str(line[2]) + '\n' + matrix
-        print(block)
-        result += block + '\n'
+    if line["j2"] == k1:
+        matrix = matGenerator.generateMatrix(line["j2"], line["j1"], line["j1"] - line["j2"])
+        block = [line, matrix]
+        chousen_blocks.append(block)
+    if line["j2"] == k1 + 1:
+        matrix = matGenerator.generateMatrix(line["j2"], line["j1"], line["j1"] - line["j2"] + 1)
+        block = [line, matrix]
+        chousen_blocks.append(block)
 
 APP_PATH = input("Enter search.exe file path: ")
 file_path = APP_PATH + "\p"
 with open(file_path, 'w') as file:
-            file.write(result)
+        file.write(header)
+        for line in chousen_blocks:    
+            file.write(str(line[0]["energy"]) + '\t' + str(line[0]["j1"]) + " " + str(line[0]["j2"]) + " " + str(line[0]["j3"]) + '\n' + line[1] + '\n')
 
 
 pIntrisics = subprocess.Popen([os.path.join(APP_PATH, "SEARCH.exe")], cwd=APP_PATH, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -85,7 +88,7 @@ pIntrisics.wait()
 
 with open(APP_PATH + "\search", 'r', encoding='utf-8') as file:
         inputData = file.readlines()
-data = filter.format_content(inputData)
+data = filter.format_content(inputData, chousen_blocks)
 output_file_path = input("Enter output file path: ")
 # Запись отформатированного содержимого в новый файл
 with open(output_file_path, 'w', encoding='utf-8') as file:
@@ -115,4 +118,13 @@ with open(output_file_path, 'w', encoding='utf-8') as file:
                     file.write(str(line["j1"]) + ' ' + str(line["j2"]) + ' ' + str(line["j3"]) + ' ' + str(line["level_energy"]) + ' ' + str(line["intensity"]) + ' ' + str(line["energy"]))
                     file.write('\n')
                 file.write('\n')
+
+
+chousen_blocks = enengyChoose.chooseEnergy(filtered_data, 0)
+output_file_path = path + "\OBFULEXT.EXP"
+with open(output_file_path, 'w', encoding='windows-1251') as file:
+     file.write(f"J ЌЂ—.     {j}   J ЉЋЌ.   {jn}  ЉЋ‹ ‹€Ќ€‰  {len(chousen_blocks)}\n")
+     for line in chousen_blocks:
+          file.write(line + '\n')
+
 input("Press enter to exit;")
