@@ -12,9 +12,17 @@ with open(file_path, 'r') as file:
     content = file.readlines()
 
 # Регулярные выражения для поиска данных
+# Пример строки 10 V= 1  J=  3   0   3      2699.225910      2699.068338  .15757E+02    100                     v3
 iteration_re = re.compile(r'iteration')
 j_v_matrix_re = re.compile(r'J=\s*(\d+)\s*(\d+)\s*matrix')
-v_j_values_re = re.compile(r'(\d+)\s+V=\s*\d+\s*J=\s*(\d+)\s*(\d+)\s*(\d+)\s*(\d+)\s*([\d.]+(?:E[+-]?\d+)?)\s*')
+v_j_values_re = re.compile(r'''
+                           (\d+)\s+V=\s*\d+\s*J=\s*(\d+)\s*(\d+)\s*(\d+)\s*     # Начальные значения 10 V= 1  J=  3   0   3
+                           (?:([\d.]+)\s+)?                                     # Первое число с плавающей точкой (необязательное) 2699.225910
+                           ([\d.]+)\s+                                          # Второе число с плавающей точкой 2699.068338
+                           (?:([\d.]+(?:E[+-]?\d+)?)\s+)?                         # Третье число с плавающей точкой или в экспоненциальной нотации (необязательное) .15757E+02
+                           (?:([\d.]+)\s+)?                                   # Четвертое число с возможной плавающей точкой (необязательное) 100
+                           v3                                                   # v3
+                           ''', re.VERBOSE)
 
 data = []
 current_j = None
@@ -27,13 +35,16 @@ for line in content:
         current_j = int(j_v_matrix_match.group(1))
         continue
     v_j_values_match = v_j_values_re.search(line)
+    
     if v_j_values_match:
+        #for group_num, group in enumerate(v_j_values_match.groups(), 1):
+             #print(f"Group {group_num}: {group}")
         line = {
              "V": int(v_j_values_match.group(1)),
              "j1":int(v_j_values_match.group(2)),
              "j2":int(v_j_values_match.group(3)),
              "j3":int(v_j_values_match.group(4)),
-             "energy":float(v_j_values_match.group(5) + v_j_values_match.group(6))
+             "energy":float(v_j_values_match.group(6))
         }
         data.append(line)
     
