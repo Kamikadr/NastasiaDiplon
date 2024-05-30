@@ -81,7 +81,7 @@ def run_pipeline(path, k1, j, jn, controlFile, spectrumFile, rangeValue, accurac
     filtered_data = filter.filterEnergy(data[4:])
     create_filtered_energy_file(header, filtered_data, output_filtered_file_path)
 
-    p_data_blocks = enengyChoose.chooseEnergy(filtered_data, k)
+    p_data_blocks = enengyChoose.chooseBlock(filtered_data, k)
     obfulext_exp_path = path + "\OBFULEXT.EXP"
     create_obfulext_exp_file(p_data_blocks, obfulext_exp_path)
 
