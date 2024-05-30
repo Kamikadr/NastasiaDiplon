@@ -53,6 +53,6 @@ def getWeigth(block):
 def getAverageEnergy(block):
     sum = 0
     for line in block:
-        sum += line["level_energy"]
+        sum += line["energy"]
     average = sum / len(block)
     return round(average, 5)
