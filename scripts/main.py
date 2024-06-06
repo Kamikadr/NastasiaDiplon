@@ -154,9 +154,9 @@ if __name__ == "__main__":
         iteration_count = int(input("Enter count of iteration: "))
         dat_line = input("Enter switch line for DAT file")
         blacklist = []
-        blacklist_count = int(input("Enter count of blacklist item"))
+        blacklist_count = int(input("Enter count of blacklist item: "))
         for i in range(0, blacklist_count, 1):
-            item = int(input("Enter blacklist item"))
+            item = int(input("Enter blacklist item: "))
             blacklist.append(item)
 
         for i in range(1, iteration_count, 1):
