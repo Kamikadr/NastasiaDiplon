@@ -1,13 +1,14 @@
 import os
 import subprocess
 
-def UseOBFULEXTS(path):
+def UseOBFULEXTS(path, count):
     pIntrisics = subprocess.Popen([os.path.join(path, "OBFULEXTS.exe")], cwd=path,stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    first_input = "1\n"
+    first_input = f"{count}\n"
     pIntrisics.stdin.write(first_input.encode('cp1251'))
     pIntrisics.stdin.flush()
-    pIntrisics.stdin.write("\n".encode('cp1251'))
-    pIntrisics.stdin.flush()
+    for i in range(0, count, 1):
+        pIntrisics.stdin.write("\n".encode('cp1251'))
+        pIntrisics.stdin.flush()
 
     pIntrisics.stdin.close()
     stdout, stderr = pIntrisics.communicate()

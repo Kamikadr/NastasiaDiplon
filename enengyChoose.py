@@ -51,13 +51,13 @@ def chooseBlock(data, needIndex):
                     break
                 
                 if currentK != line["j2"]:
-                    diff = maxEnergy - minEnergy
-                    if diff < 0.001:
-                        if len(currentSubblock) is not  0:
+                    if len(currentSubblock) > 0:
+                        diff = maxEnergy - minEnergy
+                        if diff < 0.001:
                             applied_blocks.append(currentSubblock)
-                    if minDiff > diff:
-                        minDiff = diff
-                        minDiffBlock = currentSubblock
+                        if minDiff > diff:
+                            minDiff = diff
+                            minDiffBlock = currentSubblock
                     currentK = line["j2"]
                     currentSubblock = []
                 currentSubblock.append(line)
@@ -70,11 +70,14 @@ def chooseBlock(data, needIndex):
             diff = maxEnergy - minEnergy
             if diff < 0.001:
                 applied_blocks.append(currentSubblock)
+            elif diff < minDiff:
+                minDiff = diff
+                minDiffBlock = currentSubblock
     
             if len(applied_blocks) == 0:
                 best_search_blocks.append(minDiffBlock)
                 continue
-            if applied_blocks == 1:
+            elif len(applied_blocks) == 1:
                 best_search_blocks.append(applied_blocks[0])
                 continue
             else:
@@ -94,7 +97,19 @@ def chooseBlock(data, needIndex):
         if len(best_search_blocks) == 0:
             continue
         elif len(best_search_blocks) == 1:
-            result.append(createBlockItem(best_search_blocks[0], search_block, True))
+            #####
+            maxEnergy = 0
+            minEnergy = 10000000
+            for line in best_search_blocks[0]:
+                    if maxEnergy < line["energy"]:
+                        maxEnergy = line["energy"]
+                    if minEnergy > line["energy"]:
+                        minEnergy = line["energy"]
+            diff = maxEnergy - minEnergy
+            if diff < 0.001:
+                result.append(createBlockItem(best_search_blocks[0], search_block, False))
+            else:
+                result.append(createBlockItem(best_search_blocks[0], search_block, True))
         else:
             first_filtered_blocks = []
             minDiff = 1000000
@@ -178,6 +193,10 @@ def getMinIntensityBlock(blocks):
 
 
 def createBlockItem(block, search_block, isBadBlock):
+    return {"V": search_block[0]['V'],
+            "energy": f"{getAverageEnergy(block):.5f}",
+            "weigth": getWeigth(block, isBadBlock),
+            "J": f"J=  {search_block[0]['j1']}  {search_block[0]['j2']}  {search_block[0]['j3']}"}
     return f"  {search_block[0]['V']}  {getAverageEnergy(block):.5f}    {getWeigth(block, isBadBlock)}          J=  {search_block[0]['j1']}  {search_block[0]['j2']}  {search_block[0]['j3']}   001"
 
 def getWeigth(block, isBadBlock):
