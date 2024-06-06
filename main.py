@@ -66,7 +66,11 @@ def create_obfulext_dat_file(data, file_path, dat_line):
         file.write(data)
         file.write(f" {dat_line}")
 #data[i]["diff"][0] != '-'
-def changeWeigthByFirstFile(energy_data, data):
+def changeWeigthByFirstFile(energy_data, data, blacklist):
+    for line in energy_data:
+        if line["V"] in blacklist:
+            line["weigth"] = 0
+
     for i in range(0, len(data), 1):
         if data[i]["diff"] is not None and data[i]["diff"][-2:] == "02" and data[i]["diff"][-3] != '-':
             for line in energy_data:
@@ -78,7 +82,7 @@ def changeWeigthByFirstFile(energy_data, data):
 
 def run_pipeline(path, k1, j, jn, controlFile, spectrumFile, rangeValue, accuracy, APP_PATH, output_search_file_path,
                   output_filtered_file_path, k, iteration,
-                  dat_line):
+                  dat_line, blacklist):
     obfulext_res_file_path = path + '/OBFULEXT.RES'
     raw_data = readFile(obfulext_res_file_path)
     data = obfulext_res_parser.parseFile(raw_data, iteration)
@@ -101,7 +105,7 @@ def run_pipeline(path, k1, j, jn, controlFile, spectrumFile, rangeValue, accurac
     create_filtered_energy_file(header, filtered_data, output_filtered_file_path)
 
     energy_blocks = enengyChoose.chooseBlock(filtered_data, k)
-    changeWeigthByFirstFile(energy_blocks, data)
+    changeWeigthByFirstFile(energy_blocks, data, blacklist)
     obfulext_exp_path = path + "\OBFULEXT.EXP"
     create_obfulext_exp_file(energy_blocks, obfulext_exp_path)
 
@@ -110,7 +114,7 @@ def run_pipeline(path, k1, j, jn, controlFile, spectrumFile, rangeValue, accurac
     raw_data = readFile(obfulext_res_file_path)
     data = obfulext_res_parser.parseFile(raw_data, 5)
     data.pop()
-    changeWeigthByFirstFile(energy_blocks, data)
+    changeWeigthByFirstFile(energy_blocks, data, blacklist)
 
     exe_user.UseOBFULEXTS(path, 5)
 
@@ -141,15 +145,22 @@ if __name__ == "__main__":
     output_search_file_path = input("Enter output file path: ")
     output_filtered_file_path = input("Enter output filtered file path: ")
     k = int(input("Enter k: "))
-    dat_line = "0 0 0 0 1 1 0 1 1 1 0 1 1 1 1 0 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1"
+    dat_line = "0 1 0 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1"
+    blacklist = []
     run_pipeline(path, k1, j, jn, controlFile, spectrumFile, rangeValue, 
-                 accuracy, APP_PATH, output_search_file_path, output_filtered_file_path, k, 1, dat_line)
+                 accuracy, APP_PATH, output_search_file_path, output_filtered_file_path, k, 1, dat_line, blacklist)
     flag = "1"
     while flag == "1":
         iteration_count = int(input("Enter count of iteration: "))
         dat_line = input("Enter switch line for DAT file")
+        blacklist = []
+        blacklist_count = int(input("Enter count of blacklist item"))
+        for i in range(0, blacklist_count, 1):
+            item = int(input("Enter blacklist item"))
+            blacklist.append(item)
+
         for i in range(1, iteration_count, 1):
             run_pipeline(path, k1, j, jn, controlFile, spectrumFile, rangeValue,
-                         accuracy, APP_PATH, output_search_file_path, output_filtered_file_path, k, 5, dat_line)
+                         accuracy, APP_PATH, output_search_file_path, output_filtered_file_path, k, 5, dat_line, blacklist)
         flag = input("Do you want to continue? Enter '1' to continue or anything else to exit: ")
 
